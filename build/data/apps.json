@@ -1,0 +1,22 @@
+{
+  "apps": [
+    {
+      "id": "1",
+      "name": "Telegram Bot",
+      "description": "A powerful bot for your Telegram channel",
+      "icon": "🤖",
+      "tags": ["bot", "automation"],
+      "features": ["Command handling", "Inline queries", "Custom keyboards"],
+      "link": "https://t.me/your_bot"
+    },
+    {
+      "id": "2",
+      "name": "News Channel",
+      "description": "Stay updated with the latest news",
+      "icon": "📰",
+      "tags": ["channel", "news"],
+      "features": ["Daily updates", "Breaking news", "Categories"],
+      "link": "https://t.me/your_channel"
+    }
+  ]
+} 
