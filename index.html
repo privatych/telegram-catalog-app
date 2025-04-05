@@ -207,13 +207,15 @@
       To begin the development, run `npm start` or `yarn start`.
       To create a production bundle, use `npm run build` or `yarn build`.
     -->
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-analytics-compat.js"></script>
+    <!-- Telegram SDK -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     
-    <script>
+    <!-- Firebase SDK -->
+    <script type="module">
+      // Import the functions you need from the SDKs you need
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+      import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+      
       // Initialize Telegram WebApp
       let tg;
       if (window.Telegram && window.Telegram.WebApp) {
@@ -236,18 +238,6 @@
         console.log('Platform:', tg.platform);
         console.log('Theme params:', tg.themeParams);
       }
-
-      // Проверка и очистка кэшированных инициализаций Firebase
-      if (window.firebase && typeof window.firebase.app === 'function') {
-        const apps = window.firebase.apps || [];
-        apps.forEach(app => {
-          try {
-            app.delete();
-          } catch (e) {
-            console.error("Error deleting Firebase app:", e);
-          }
-        });
-      }
       
       // Firebase configuration
       const firebaseConfig = {
@@ -260,12 +250,11 @@
         measurementId: "G-6KN9KNQZW2"
       };
 
-      // Initialize Firebase - с полной очисткой и переинициализацией
-      const firebaseApp = firebase.initializeApp(firebaseConfig);
-      const db = firebaseApp.firestore();
+      // Initialize Firebase
+      const app = initializeApp(firebaseConfig);
+      const db = getFirestore(app);
       
-      // Добавляем логирование для отладки
-      console.log("Firebase инициализирован:", firebaseApp);
+      console.log("Firebase initialized (modular SDK)");
       
       // Sample fallback data in case Firebase isn't working
       const fallbackApps = [
@@ -332,12 +321,12 @@
           appCard.setAttribute('data-id', app.id);
           
           appCard.innerHTML = `
-            <div class="app-icon">${app.icon}</div>
+            <div class="app-icon">${app.icon || '📱'}</div>
             <div class="app-details">
-              <h3 class="app-name">${app.name}</h3>
-              <p class="app-description">${app.description}</p>
+              <h3 class="app-name">${app.name || 'Без названия'}</h3>
+              <p class="app-description">${app.description || 'Нет описания'}</p>
               <div class="tags">
-                ${app.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+                ${(app.tags || []).map(tag => `<span class="tag">${tag}</span>`).join('')}
               </div>
               <button class="open-button" data-link="${app.telegramLink}">Открыть</button>
             </div>
@@ -383,32 +372,33 @@
       }
       
       // Fetch apps from Firestore
-      function fetchApps() {
+      async function fetchApps() {
         const appList = document.getElementById('app-list');
         
-        db.collection('apps').get()
-          .then(snapshot => {
-            if (snapshot.empty) {
-              console.log('No apps found in Firestore, using fallback data');
-              apps = fallbackApps;
-            } else {
-              apps = snapshot.docs.map(doc => ({
-                id: doc.id,
-                ...doc.data()
-              }));
-              console.log('Apps loaded from Firestore:', apps.length);
-            }
-            renderApps(selectedCategory);
-          })
-          .catch(error => {
-            console.error('Error fetching apps from Firestore:', error);
+        try {
+          const appsSnapshot = await getDocs(collection(db, 'apps'));
+          
+          if (appsSnapshot.empty) {
+            console.log('No apps found in Firestore, using fallback data');
             apps = fallbackApps;
-            appList.innerHTML = `
-              <div class="error-state">
-                <p>Произошла ошибка при загрузке данных. Пожалуйста, попробуйте позже.</p>
-              </div>
-            `;
-          });
+          } else {
+            apps = appsSnapshot.docs.map(doc => ({
+              id: doc.id,
+              ...doc.data()
+            }));
+            console.log('Apps loaded from Firestore:', apps.length);
+          }
+          renderApps(selectedCategory);
+        } catch (error) {
+          console.error('Error fetching apps from Firestore:', error);
+          apps = fallbackApps;
+          renderApps(selectedCategory);
+          appList.innerHTML += `
+            <div class="error-state">
+              <p>Произошла ошибка при загрузке данных: ${error.message}</p>
+            </div>
+          `;
+        }
       }
       
       // Initialize
