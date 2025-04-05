@@ -1,71 +1,84 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useCatalogStore } from '../store/catalogStore';
 import { CatalogItem } from '../components/CatalogItem';
 
 export const CatalogPage: React.FC = () => {
-  const { apps, selectedType, setSelectedType } = useCatalogStore();
+  const { apps, selectedType, setSelectedType, loadApps, isLoading, error } = useCatalogStore();
+
+  useEffect(() => {
+    loadApps();
+  }, [loadApps]);
 
   const filteredApps = apps.filter((app) => {
-    if (selectedType === 'all') return true;
+    if (!selectedType || selectedType === 'all') return true;
     return app.tags.includes(selectedType);
   });
 
-  return (
-    <div className="min-h-screen bg-telegram-light p-4">
-      <div className="max-w-6xl mx-auto">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-medium text-telegram-text">
-            Каталог приложений
-          </h1>
-          <div className="flex gap-2">
-            <button
-              onClick={() => setSelectedType('all')}
-              className={`px-4 py-2 rounded-lg transition-colors ${
-                selectedType === 'all'
-                  ? 'bg-telegram-primary text-white'
-                  : 'bg-telegram-surface text-telegram-text-secondary hover:bg-telegram-light'
-              }`}
-            >
-              Все
-            </button>
-            <button
-              onClick={() => setSelectedType('channel')}
-              className={`px-4 py-2 rounded-lg transition-colors ${
-                selectedType === 'channel'
-                  ? 'bg-telegram-primary text-white'
-                  : 'bg-telegram-surface text-telegram-text-secondary hover:bg-telegram-light'
-              }`}
-            >
-              Каналы
-            </button>
-            <button
-              onClick={() => setSelectedType('bot')}
-              className={`px-4 py-2 rounded-lg transition-colors ${
-                selectedType === 'bot'
-                  ? 'bg-telegram-primary text-white'
-                  : 'bg-telegram-surface text-telegram-text-secondary hover:bg-telegram-light'
-              }`}
-            >
-              Боты
-            </button>
-            <button
-              onClick={() => setSelectedType('app')}
-              className={`px-4 py-2 rounded-lg transition-colors ${
-                selectedType === 'app'
-                  ? 'bg-telegram-primary text-white'
-                  : 'bg-telegram-surface text-telegram-text-secondary hover:bg-telegram-light'
-              }`}
-            >
-              Приложения
-            </button>
-          </div>
-        </div>
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center py-8">
+        <div className="text-telegram-text-secondary">Загрузка...</div>
+      </div>
+    );
+  }
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredApps.map((app) => (
-            <CatalogItem key={app.id} app={app} />
-          ))}
-        </div>
+  if (error) {
+    return (
+      <div className="flex justify-center items-center py-8">
+        <div className="text-red-500">{error}</div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      <div className="flex gap-1 -mx-4 px-4 py-2 overflow-x-auto hide-scrollbar bg-telegram-background sticky top-[52px] z-10">
+        <button
+          onClick={() => setSelectedType('all')}
+          className={`px-4 py-2 rounded-lg transition-colors whitespace-nowrap ${
+            !selectedType || selectedType === 'all'
+              ? 'bg-telegram-primary text-white'
+              : 'bg-telegram-surface text-telegram-text-secondary hover:bg-telegram-light'
+          }`}
+        >
+          Все
+        </button>
+        <button
+          onClick={() => setSelectedType('channel')}
+          className={`px-4 py-2 rounded-lg transition-colors whitespace-nowrap ${
+            selectedType === 'channel'
+              ? 'bg-telegram-primary text-white'
+              : 'bg-telegram-surface text-telegram-text-secondary hover:bg-telegram-light'
+          }`}
+        >
+          Каналы
+        </button>
+        <button
+          onClick={() => setSelectedType('bot')}
+          className={`px-4 py-2 rounded-lg transition-colors whitespace-nowrap ${
+            selectedType === 'bot'
+              ? 'bg-telegram-primary text-white'
+              : 'bg-telegram-surface text-telegram-text-secondary hover:bg-telegram-light'
+          }`}
+        >
+          Боты
+        </button>
+        <button
+          onClick={() => setSelectedType('app')}
+          className={`px-4 py-2 rounded-lg transition-colors whitespace-nowrap ${
+            selectedType === 'app'
+              ? 'bg-telegram-primary text-white'
+              : 'bg-telegram-surface text-telegram-text-secondary hover:bg-telegram-light'
+          }`}
+        >
+          Приложения
+        </button>
+      </div>
+
+      <div className="space-y-2">
+        {filteredApps.map((app) => (
+          <CatalogItem key={app.id} app={app} />
+        ))}
       </div>
     </div>
   );

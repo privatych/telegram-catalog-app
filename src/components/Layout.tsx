@@ -17,25 +17,18 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
   }, [darkMode]);
 
   return (
-    <div className="min-h-screen bg-background-light dark:bg-background-dark">
-      <header className="bg-surface-light dark:bg-surface-dark shadow-sm">
-        <div className="container mx-auto px-4">
-          <div className="flex justify-between items-center h-16">
-            <h1 className="text-xl font-bold text-text-light dark:text-text-dark">
-              Telegram Catalog
-            </h1>
-            <button
-              onClick={toggleDarkMode}
-              className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-            >
-              {darkMode ? '🌞' : '🌙'}
-            </button>
-          </div>
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="flex justify-end mb-6">
+          <button
+            onClick={toggleDarkMode}
+            className="p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+          >
+            {darkMode ? '🌞' : '🌙'}
+          </button>
         </div>
-      </header>
-      <main>
         {children}
-      </main>
+      </div>
     </div>
   );
 }; 

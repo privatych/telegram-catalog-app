@@ -1,5 +1,6 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc } from 'firebase/firestore';
+import { db } from '../firebase';
 
 export interface App {
   id: string;
@@ -13,52 +14,82 @@ export interface App {
 
 interface CatalogState {
   apps: App[];
-  selectedType: 'all' | 'channel' | 'bot' | 'app';
-  setSelectedType: (type: 'all' | 'channel' | 'bot' | 'app') => void;
-  addApp: (app: Omit<App, 'id'>) => void;
-  removeApp: (id: string) => void;
-  editApp: (id: string, app: Omit<App, 'id'>) => void;
+  selectedType: string | null;
+  isLoading: boolean;
+  error: string | null;
+  loadApps: () => Promise<void>;
+  addApp: (app: Omit<App, 'id'>) => Promise<void>;
+  updateApp: (id: string, app: Partial<App>) => Promise<void>;
+  deleteApp: (id: string) => Promise<void>;
+  setSelectedType: (type: string | null) => void;
 }
 
-export const useCatalogStore = create<CatalogState>()(
-  persist(
-    (set) => ({
-      apps: [
-        {
-          id: '1',
-          name: 'Telegram Bot',
-          description: 'A powerful bot for your Telegram channel',
-          icon: '🤖',
-          tags: ['bot', 'automation'],
-          features: ['Command handling', 'Inline queries', 'Custom keyboards'],
-          link: 'https://t.me/your_bot',
-        },
-        {
-          id: '2',
-          name: 'News Channel',
-          description: 'Stay updated with the latest news',
-          icon: '📰',
-          tags: ['channel', 'news'],
-          features: ['Daily updates', 'Breaking news', 'Categories'],
-          link: 'https://t.me/your_channel',
-        },
-      ],
-      selectedType: 'all',
-      setSelectedType: (type) => set({ selectedType: type }),
-      addApp: (app) => set((state) => ({
-        apps: [...state.apps, { ...app, id: Date.now().toString() }],
-      })),
-      removeApp: (id) => set((state) => ({
-        apps: state.apps.filter((app) => app.id !== id),
-      })),
-      editApp: (id, app) => set((state) => ({
-        apps: state.apps.map((existingApp) => 
-          existingApp.id === id ? { ...app, id } : existingApp
-        ),
-      })),
-    }),
-    {
-      name: 'catalog-storage',
+export const useCatalogStore = create<CatalogState>((set, get) => ({
+  apps: [],
+  selectedType: null,
+  isLoading: false,
+  error: null,
+
+  loadApps: async () => {
+    set({ isLoading: true, error: null });
+    try {
+      const querySnapshot = await getDocs(collection(db, 'apps'));
+      const apps = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      })) as App[];
+      set({ apps, isLoading: false });
+    } catch (error) {
+      set({ error: 'Failed to load apps', isLoading: false });
+      console.error('Error loading apps:', error);
     }
-  )
-); 
+  },
+
+  addApp: async (app) => {
+    set({ isLoading: true, error: null });
+    try {
+      const docRef = await addDoc(collection(db, 'apps'), app);
+      const newApp = { ...app, id: docRef.id };
+      set(state => ({
+        apps: [...state.apps, newApp],
+        isLoading: false
+      }));
+    } catch (error) {
+      set({ error: 'Failed to add app', isLoading: false });
+      console.error('Error adding app:', error);
+    }
+  },
+
+  updateApp: async (id, appUpdate) => {
+    set({ isLoading: true, error: null });
+    try {
+      const docRef = doc(db, 'apps', id);
+      await updateDoc(docRef, appUpdate);
+      set(state => ({
+        apps: state.apps.map(app => 
+          app.id === id ? { ...app, ...appUpdate } : app
+        ),
+        isLoading: false
+      }));
+    } catch (error) {
+      set({ error: 'Failed to update app', isLoading: false });
+      console.error('Error updating app:', error);
+    }
+  },
+
+  deleteApp: async (id) => {
+    set({ isLoading: true, error: null });
+    try {
+      await deleteDoc(doc(db, 'apps', id));
+      set(state => ({
+        apps: state.apps.filter(app => app.id !== id),
+        isLoading: false
+      }));
+    } catch (error) {
+      set({ error: 'Failed to delete app', isLoading: false });
+      console.error('Error deleting app:', error);
+    }
+  },
+
+  setSelectedType: (type) => set({ selectedType: type })
+})); 

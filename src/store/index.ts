@@ -1,11 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { UserPreferences } from '../types';
-
-interface AppState extends UserPreferences {
-  toggleDarkMode: () => void;
-  toggleFavorite: (id: string) => void;
-}
+import { UserPreferences, AppState } from '../types';
 
 export const useStore = create<AppState>()(
   persist(

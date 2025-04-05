@@ -1,34 +1,68 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { 
+  getAuth, 
+  signInWithEmailAndPassword, 
+  signOut as firebaseSignOut,
+  onAuthStateChanged,
+  type User
+} from 'firebase/auth';
+import { app } from '../firebase';
 
 interface AuthState {
-  isAuthenticated: boolean;
-  token: string | null;
-  login: (username: string, password: string) => Promise<boolean>;
-  logout: () => void;
+  user: User | null;
+  isLoading: boolean;
+  error: string | null;
+  signIn: (email: string, password: string) => Promise<void>;
+  signOut: () => Promise<void>;
+  checkAuth: () => Promise<void>;
 }
 
-export const useAuthStore = create<AuthState>()(
-  persist(
-    (set) => ({
-      isAuthenticated: false,
-      token: null,
-      login: async (username: string, password: string) => {
-        // Здесь обычно был бы вызов API
-        if (username === 'admin' && password === '3vPjoDvsoNGQ6FXIbHTHBkF5r7JRci23') {
-          set({ isAuthenticated: true, token: 'dummy-token' });
-          return true;
-        }
-        // Добавляем задержку 15 секунд при неверном пароле
-        await new Promise(resolve => setTimeout(resolve, 15000));
-        return false;
-      },
-      logout: () => {
-        set({ isAuthenticated: false, token: null });
-      },
-    }),
-    {
-      name: 'auth-storage',
+export const useAuthStore = create<AuthState>((set) => {
+  const auth = getAuth(app);
+
+  // Слушаем изменения состояния аутентификации
+  onAuthStateChanged(auth, (user) => {
+    set({ user, isLoading: false });
+  });
+
+  return {
+    user: null,
+    isLoading: true,
+    error: null,
+
+    signIn: async (email: string, password: string) => {
+      set({ isLoading: true, error: null });
+      try {
+        await signInWithEmailAndPassword(auth, email, password);
+      } catch (error) {
+        set({ error: 'Invalid email or password' });
+        throw error;
+      } finally {
+        set({ isLoading: false });
+      }
+    },
+
+    signOut: async () => {
+      set({ isLoading: true, error: null });
+      try {
+        await firebaseSignOut(auth);
+        set({ user: null });
+      } catch (error) {
+        set({ error: 'Failed to sign out' });
+        throw error;
+      } finally {
+        set({ isLoading: false });
+      }
+    },
+
+    checkAuth: async () => {
+      return new Promise((resolve) => {
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
+          set({ user, isLoading: false });
+          unsubscribe();
+          resolve();
+        });
+      });
     }
-  )
-); 
+  };
+}); 

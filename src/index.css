@@ -5,14 +5,28 @@
 @tailwind utilities;
 
 @layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    height: 100%;
+    overflow-x: hidden;
+  }
+  
   body {
-    @apply bg-telegram-light text-telegram-text;
     margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow-x: hidden;
+    background-color: #ffffff;
+    color: #000000;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
       'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
       sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+  }
+
+  #root {
+    height: 100%;
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -34,19 +48,15 @@
   }
 
   .card {
-    @apply bg-telegram-background rounded-lg shadow-card p-4 
-           hover:shadow-card-hover transition-shadow duration-200
-           border border-telegram-border;
+    @apply bg-telegram-background shadow-card rounded-lg p-4;
   }
 
   .input {
-    @apply w-full px-3 py-2 border border-telegram-border rounded-lg
-           focus:outline-none focus:ring-2 focus:ring-telegram-primary
-           text-telegram-text;
+    @apply w-full px-3 py-2 border border-telegram-border rounded-lg focus:outline-none focus:ring-2 focus:ring-telegram-button text-telegram-text;
   }
 
   .tag {
-    @apply px-2 py-1 bg-telegram-surface text-telegram-text-secondary rounded-full;
+    @apply px-2 py-1 bg-telegram-surface text-telegram-hint rounded-full text-sm;
   }
 
   .active-item {
@@ -54,24 +64,78 @@
   }
 
   .hover-item {
-    @apply hover:bg-telegram-surface transition-colors duration-200;
+    @apply hover:bg-telegram-surface;
   }
 
   .page-container {
-    @apply min-h-screen bg-telegram-light text-telegram-text;
+    @apply min-h-screen bg-telegram-background text-telegram-text;
   }
 
   .header {
-    @apply bg-telegram-background border-b border-telegram-border
-           sticky top-0 z-40;
+    @apply bg-telegram-background border-b border-telegram-border;
   }
 
   .content {
     @apply max-w-7xl mx-auto px-4 py-8;
+  }
+
+  .button {
+    @apply px-4 py-2 bg-telegram-button text-telegram-button-text rounded-lg hover:opacity-90 transition-opacity;
+  }
+
+  .button-secondary {
+    @apply px-4 py-2 bg-telegram-secondary-bg text-telegram-text rounded-lg hover:opacity-90 transition-opacity;
+  }
+
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .link {
+    @apply text-telegram-link hover:underline;
   }
 }
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
+}
+
+/* Telegram Mini App specific styles */
+.tma-root {
+  max-width: 480px;
+  margin: 0 auto;
+  min-height: 100vh;
+  background-color: var(--tg-theme-bg-color, #ffffff);
+  color: var(--tg-theme-text-color, #000000);
+}
+
+/* Fix for mobile viewport */
+@media screen and (max-width: 480px) {
+  html {
+    font-size: 16px;
+  }
+
+  body {
+    touch-action: pan-y pinch-zoom;
+  }
+
+  .tma-root {
+    width: 100%;
+  }
+}
+
+/* Hide scrollbar but keep functionality */
+::-webkit-scrollbar {
+  display: none;
+}
+
+* {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }

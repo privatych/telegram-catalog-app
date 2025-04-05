@@ -1,50 +1,42 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { CatalogPage } from './pages/CatalogPage';
-import { AppDetailPage } from './pages/AppDetailPage';
-import { AdminLoginPage } from './pages/AdminLoginPage';
-import { AdminDashboardPage } from './pages/AdminDashboardPage';
-import { useAuthStore } from './store/authStore';
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import Admin from './pages/Admin';
+import Home from './pages/Home';
 
-const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { isAuthenticated } = useAuthStore();
-  
-  if (!isAuthenticated) {
-    return <Navigate to="/admin/login" replace />;
-  }
-
-  return <>{children}</>;
-};
-
-function App() {
+const App = () => {
   return (
     <Router>
-      <div className="min-h-screen bg-telegram-light">
-        <header className="bg-telegram-background border-b border-telegram-border">
-          <div className="max-w-7xl mx-auto px-4 py-4">
-            <h1 className="text-2xl font-medium text-telegram-text">
-              ITOQ Mini Apps
-            </h1>
+      <div className="min-h-screen bg-gray-100">
+        <nav className="bg-white shadow-sm">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex justify-between h-16">
+              <div className="flex">
+                <div className="flex-shrink-0 flex items-center">
+                  <Link to="/" className="text-xl font-bold text-indigo-600">
+                    ITOQ Space
+                  </Link>
+                </div>
+              </div>
+              <div className="flex items-center">
+                <Link
+                  to="/admin"
+                  className="ml-4 px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700"
+                >
+                  Админ-панель
+                </Link>
+              </div>
+            </div>
           </div>
-        </header>
-        <main className="container mx-auto px-4 py-8">
+        </nav>
+
+        <main>
           <Routes>
-            <Route path="/" element={<CatalogPage />} />
-            <Route path="/app/:id" element={<AppDetailPage />} />
-            <Route path="/admin/login" element={<AdminLoginPage />} />
-            <Route
-              path="/admin/dashboard"
-              element={
-                <ProtectedRoute>
-                  <AdminDashboardPage />
-                </ProtectedRoute>
-              }
-            />
+            <Route path="/" element={<Home />} />
+            <Route path="/admin" element={<Admin />} />
           </Routes>
         </main>
       </div>
     </Router>
   );
-}
+};
 
 export default App;
