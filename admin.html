@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+  <meta name="theme-color" content="#000000" />
+  <title>ITOQ Space - Админ панель</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      background-color: #f6f8fa;
+      color: #24292e;
+      line-height: 1.5;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    .header {
+      background-color: #0088cc;
+      color: #fff;
+      padding: 16px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .header h1 {
+      font-size: 24px;
+      font-weight: 600;
+    }
+    
+    .header .user-info {
+      display: flex;
+      align-items: center;
+    }
+    
+    .header .user-email {
+      margin-right: 10px;
+    }
+    
+    .card {
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+      margin-bottom: 20px;
+      overflow: hidden;
+    }
+    
+    .card-header {
+      background-color: #f1f1f1;
+      padding: 15px 20px;
+      border-bottom: 1px solid #e1e4e8;
+      font-weight: 600;
+    }
+    
+    .card-body {
+      padding: 20px;
+    }
+    
+    .form-group {
+      margin-bottom: 15px;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 500;
+    }
+    
+    .form-control {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+    
+    .btn {
+      display: inline-block;
+      background-color: #0088cc;
+      color: #fff;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    
+    .btn-danger {
+      background-color: #d73a49;
+    }
+    
+    .btn-outline {
+      background-color: transparent;
+      border: 1px solid #0088cc;
+      color: #0088cc;
+    }
+    
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    
+    .table th, .table td {
+      padding: 10px;
+      text-align: left;
+      border-bottom: 1px solid #e1e4e8;
+    }
+    
+    .table th {
+      background-color: #f6f8fa;
+      font-weight: 600;
+    }
+    
+    .badge {
+      display: inline-block;
+      padding: 3px 6px;
+      font-size: 12px;
+      font-weight: 500;
+      border-radius: 12px;
+      background-color: #f1f8ff;
+      color: #0366d6;
+      margin-right: 5px;
+      margin-bottom: 5px;
+    }
+    
+    .login-container {
+      max-width: 400px;
+      margin: 100px auto;
+      padding: 20px;
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+    }
+    
+    .alert {
+      padding: 10px 15px;
+      border-radius: 4px;
+      margin-bottom: 15px;
+    }
+    
+    .alert-danger {
+      background-color: #ffdce0;
+      color: #86181d;
+      border: 1px solid #f97583;
+    }
+    
+    .alert-success {
+      background-color: #dcffe4;
+      color: #165c26;
+      border: 1px solid #85e89d;
+    }
+    
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div id="login-page" class="login-container">
+    <h2 style="margin-bottom: 20px; text-align: center;">ITOQ Space - Вход</h2>
+    <div id="login-error" class="alert alert-danger hidden"></div>
+    <div class="form-group">
+      <label for="email">Email</label>
+      <input type="email" id="email" class="form-control" placeholder="Введите email">
+    </div>
+    <div class="form-group">
+      <label for="password">Пароль</label>
+      <input type="password" id="password" class="form-control" placeholder="Введите пароль">
+    </div>
+    <button id="login-button" class="btn" style="width: 100%;">Войти</button>
+  </div>
+
+  <div id="admin-page" class="hidden">
+    <header class="header">
+      <h1>ITOQ Space - Админ панель</h1>
+      <div class="user-info">
+        <span id="user-email" class="user-email"></span>
+        <button id="logout-button" class="btn btn-outline">Выйти</button>
+      </div>
+    </header>
+
+    <div class="container">
+      <div class="card">
+        <div class="card-header">Добавить новое приложение</div>
+        <div class="card-body">
+          <div class="form-group">
+            <label for="app-name">Название</label>
+            <input type="text" id="app-name" class="form-control" placeholder="Название приложения">
+          </div>
+          <div class="form-group">
+            <label for="app-description">Описание</label>
+            <textarea id="app-description" class="form-control" rows="3" placeholder="Описание приложения"></textarea>
+          </div>
+          <div class="form-group">
+            <label for="app-icon">Иконка (эмодзи)</label>
+            <input type="text" id="app-icon" class="form-control" placeholder="Например: 🤖">
+          </div>
+          <div class="form-group">
+            <label for="app-category">Категория</label>
+            <select id="app-category" class="form-control">
+              <option value="bots">Боты</option>
+              <option value="channels">Каналы</option>
+              <option value="apps">Приложения</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="app-tags">Теги (через запятую)</label>
+            <input type="text" id="app-tags" class="form-control" placeholder="Например: AI, ChatBot, Новости">
+          </div>
+          <div class="form-group">
+            <label for="app-link">Telegram ссылка</label>
+            <input type="text" id="app-link" class="form-control" placeholder="https://t.me/...">
+          </div>
+          <button id="add-app-button" class="btn">Добавить</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">Список приложений</div>
+        <div class="card-body">
+          <table class="table" id="apps-table">
+            <thead>
+              <tr>
+                <th>Иконка</th>
+                <th>Название</th>
+                <th>Категория</th>
+                <th>Теги</th>
+                <th>Действия</th>
+              </tr>
+            </thead>
+            <tbody id="apps-list"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+
+  <script>
+    // Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyCfaPMrXiWJxn7rOLwEjIlq9FsM7xXxwgU",
+      authDomain: "itoq-space.firebaseapp.com",
+      projectId: "itoq-space",
+      storageBucket: "itoq-space.appspot.com",
+      messagingSenderId: "354341297878",
+      appId: "1:354341297878:web:5b19b82ddb5c03e4d3e5c0",
+      measurementId: "G-6KN9KNQZW2"
+    };
+
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    
+    // DOM elements
+    const loginPage = document.getElementById('login-page');
+    const adminPage = document.getElementById('admin-page');
+    const loginError = document.getElementById('login-error');
+    const userEmail = document.getElementById('user-email');
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+    const loginButton = document.getElementById('login-button');
+    const logoutButton = document.getElementById('logout-button');
+    const addAppButton = document.getElementById('add-app-button');
+    const appsList = document.getElementById('apps-list');
+    
+    // Login functionality
+    loginButton.addEventListener('click', () => {
+      const email = emailInput.value;
+      const password = passwordInput.value;
+      
+      if (!email || !password) {
+        showLoginError('Пожалуйста, введите email и пароль');
+        return;
+      }
+      
+      auth.signInWithEmailAndPassword(email, password)
+        .catch(error => {
+          showLoginError(error.message);
+        });
+    });
+    
+    // Logout functionality
+    logoutButton.addEventListener('click', () => {
+      auth.signOut();
+    });
+    
+    // Show login error
+    function showLoginError(message) {
+      loginError.textContent = message;
+      loginError.classList.remove('hidden');
+    }
+    
+    // Auth state change listener
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        // User is signed in
+        loginPage.classList.add('hidden');
+        adminPage.classList.remove('hidden');
+        userEmail.textContent = user.email;
+        loadApps();
+      } else {
+        // User is signed out
+        loginPage.classList.remove('hidden');
+        adminPage.classList.add('hidden');
+        loginError.classList.add('hidden');
+        emailInput.value = '';
+        passwordInput.value = '';
+      }
+    });
+    
+    // Add app functionality
+    addAppButton.addEventListener('click', () => {
+      const name = document.getElementById('app-name').value;
+      const description = document.getElementById('app-description').value;
+      const icon = document.getElementById('app-icon').value;
+      const category = document.getElementById('app-category').value;
+      const tagsString = document.getElementById('app-tags').value;
+      const telegramLink = document.getElementById('app-link').value;
+      
+      if (!name || !description || !icon || !category || !tagsString || !telegramLink) {
+        alert('Пожалуйста, заполните все поля');
+        return;
+      }
+      
+      const tags = tagsString.split(',').map(tag => tag.trim());
+      
+      const app = {
+        name,
+        description,
+        icon,
+        category,
+        tags,
+        telegramLink,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      };
+      
+      db.collection('apps').add(app)
+        .then(() => {
+          // Clear form
+          document.getElementById('app-name').value = '';
+          document.getElementById('app-description').value = '';
+          document.getElementById('app-icon').value = '';
+          document.getElementById('app-category').value = 'bots';
+          document.getElementById('app-tags').value = '';
+          document.getElementById('app-link').value = '';
+          
+          // Reload apps
+          loadApps();
+        })
+        .catch(error => {
+          alert('Ошибка при добавлении приложения: ' + error.message);
+        });
+    });
+    
+    // Load apps from Firestore
+    function loadApps() {
+      appsList.innerHTML = '';
+      
+      db.collection('apps').orderBy('createdAt', 'desc').get()
+        .then(snapshot => {
+          snapshot.forEach(doc => {
+            const app = doc.data();
+            const appId = doc.id;
+            
+            const row = document.createElement('tr');
+            row.innerHTML = `
+              <td>${app.icon}</td>
+              <td>${app.name}</td>
+              <td>${getCategoryName(app.category)}</td>
+              <td>${app.tags.map(tag => `<span class="badge">${tag}</span>`).join('')}</td>
+              <td>
+                <button class="btn btn-danger delete-app" data-id="${appId}">Удалить</button>
+              </td>
+            `;
+            
+            appsList.appendChild(row);
+          });
+          
+          // Add event listeners to delete buttons
+          document.querySelectorAll('.delete-app').forEach(button => {
+            button.addEventListener('click', (e) => {
+              const appId = e.target.getAttribute('data-id');
+              deleteApp(appId);
+            });
+          });
+        })
+        .catch(error => {
+          console.error('Error loading apps:', error);
+        });
+    }
+    
+    // Delete app from Firestore
+    function deleteApp(appId) {
+      if (confirm('Вы уверены, что хотите удалить это приложение?')) {
+        db.collection('apps').doc(appId).delete()
+          .then(() => {
+            loadApps();
+          })
+          .catch(error => {
+            alert('Ошибка при удалении приложения: ' + error.message);
+          });
+      }
+    }
+    
+    // Helper function to get category name
+    function getCategoryName(categoryId) {
+      const categories = {
+        'bots': 'Боты',
+        'channels': 'Каналы',
+        'apps': 'Приложения'
+      };
+      
+      return categories[categoryId] || categoryId;
+    }
+  </script>
+</body>
+</html> 
