@@ -1,0 +1,58 @@
+import { CatalogItem } from '../types';
+
+export const mockItems: CatalogItem[] = [
+  {
+    id: '1',
+    type: 'channel',
+    title: 'Tech News',
+    description: 'Latest technology news and updates',
+    icon: '📰',
+    link: 'tg://resolve?domain=technews',
+    category: ['Technology', 'News'],
+  },
+  {
+    id: '2',
+    type: 'bot',
+    title: 'Weather Bot',
+    description: 'Get weather updates for your location',
+    icon: '🌤️',
+    link: 't.me/weatherbot?start=weather',
+    category: ['Weather', 'Utility'],
+  },
+  {
+    id: '3',
+    type: 'mini-app',
+    title: 'Task Manager',
+    description: 'Simple task management app',
+    icon: '✅',
+    link: 't.me/taskmanager_bot',
+    category: ['Productivity', 'Tools'],
+  },
+  {
+    id: '4',
+    type: 'channel',
+    title: 'Crypto Updates',
+    description: 'Latest cryptocurrency news and analysis',
+    icon: '💎',
+    link: 'tg://resolve?domain=cryptoupdates',
+    category: ['Cryptocurrency', 'Finance'],
+  },
+  {
+    id: '5',
+    type: 'bot',
+    title: 'Translation Bot',
+    description: 'Translate text between multiple languages',
+    icon: '🌐',
+    link: 't.me/translatebot?start=translate',
+    category: ['Language', 'Utility'],
+  },
+  {
+    id: '6',
+    type: 'mini-app',
+    title: 'File Converter',
+    description: 'Convert files between different formats',
+    icon: '🔄',
+    link: 't.me/fileconverter_bot',
+    category: ['Tools', 'Productivity'],
+  },
+]; 
