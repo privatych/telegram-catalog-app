@@ -247,11 +247,24 @@
   </div>
 
   <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-analytics-compat.js"></script>
 
   <script>
+    // Проверка и очистка кэшированных инициализаций Firebase
+    if (window.firebase && typeof window.firebase.app === 'function') {
+      const apps = window.firebase.apps || [];
+      apps.forEach(app => {
+        try {
+          app.delete();
+        } catch (e) {
+          console.error("Error deleting Firebase app:", e);
+        }
+      });
+    }
+    
     // Firebase configuration - обновленная конфигурация
     const firebaseConfig = {
       apiKey: "AIzaSyCfaPMrXiWJxn7rOLwEjIlq9FsM7xXxwgU",
@@ -263,12 +276,16 @@
       measurementId: "G-6KN9KNQZW2"
     };
 
-    // Initialize Firebase с проверкой существующей инициализации
-    if (!firebase.apps || !firebase.apps.length) {
-      firebase.initializeApp(firebaseConfig);
-    }
-    const auth = firebase.auth();
-    const db = firebase.firestore();
+    // Initialize Firebase - с полной очисткой и переинициализацией
+    const firebaseApp = firebase.initializeApp(firebaseConfig);
+    
+    // Инициализация сервисов
+    const auth = firebaseApp.auth();
+    const db = firebaseApp.firestore();
+    
+    // Добавляем логирование для отладки
+    console.log("Firebase инициализирован:", firebaseApp);
+    console.log("Firebase Auth инициализирован:", !!auth);
     
     // DOM elements
     const loginPage = document.getElementById('login-page');

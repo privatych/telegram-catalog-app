@@ -208,8 +208,9 @@
       To create a production bundle, use `npm run build` or `yarn build`.
     -->
     <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-analytics-compat.js"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     
     <script>
@@ -222,16 +223,30 @@
         tg.ready();
         tg.expand();
         
-        // Добавление BackButton
-        tg.BackButton.show();
-        tg.BackButton.onClick(() => {
-          // При клике на кнопку "назад" - возвращаемся на предыдущую страницу
-          window.history.back();
-        });
+        // Добавление BackButton - показываем только если история браузера > 1
+        if (window.history.length > 1) {
+          tg.BackButton.show();
+          tg.BackButton.onClick(() => {
+            // При клике на кнопку "назад" - возвращаемся на предыдущую страницу
+            window.history.back();
+          });
+        }
         
         console.log('Telegram WebApp initialized');
         console.log('Platform:', tg.platform);
         console.log('Theme params:', tg.themeParams);
+      }
+
+      // Проверка и очистка кэшированных инициализаций Firebase
+      if (window.firebase && typeof window.firebase.app === 'function') {
+        const apps = window.firebase.apps || [];
+        apps.forEach(app => {
+          try {
+            app.delete();
+          } catch (e) {
+            console.error("Error deleting Firebase app:", e);
+          }
+        });
       }
       
       // Firebase configuration
@@ -245,11 +260,12 @@
         measurementId: "G-6KN9KNQZW2"
       };
 
-      // Initialize Firebase
-      if (!firebase.apps || !firebase.apps.length) {
-        firebase.initializeApp(firebaseConfig);
-      }
-      const db = firebase.firestore();
+      // Initialize Firebase - с полной очисткой и переинициализацией
+      const firebaseApp = firebase.initializeApp(firebaseConfig);
+      const db = firebaseApp.firestore();
+      
+      // Добавляем логирование для отладки
+      console.log("Firebase инициализирован:", firebaseApp);
       
       // Sample fallback data in case Firebase isn't working
       const fallbackApps = [
@@ -334,20 +350,32 @@
         document.querySelectorAll('.open-button').forEach(button => {
           button.addEventListener('click', (e) => {
             e.stopPropagation();
-            const link = button.getAttribute('data-link');
+            e.preventDefault();
             
-            // Используем Telegram WebApp API для открытия ссылок, если доступен
-            if (window.Telegram && window.Telegram.WebApp) {
-              // Если ссылка на Telegram ресурс, используем Telegram метод
-              if (link.startsWith('https://t.me/') || link.startsWith('http://t.me/') || link.startsWith('t.me/')) {
-                // Открываем через Telegram
-                window.Telegram.WebApp.openTelegramLink(link);
+            const link = button.getAttribute('data-link');
+            console.log("Пытаемся открыть ссылку:", link);
+            
+            try {
+              if (window.Telegram && window.Telegram.WebApp) {
+                // Если это ссылка на Telegram
+                if (link.match(/^(https?:\/\/)?t\.me\//i)) {
+                  // Удаляем http/https для корректной работы
+                  const tgPath = link.replace(/^(https?:\/\/)?t\.me\//i, '');
+                  console.log("Открываем Telegram ссылку:", tgPath);
+                  window.Telegram.WebApp.openTelegramLink(tgPath);
+                } else {
+                  // Обычная веб-ссылка
+                  console.log("Открываем обычную ссылку:", link);
+                  window.Telegram.WebApp.openLink(link);
+                }
               } else {
-                // Обычная ссылка - открываем в браузере
-                window.Telegram.WebApp.openLink(link);
+                // Fallback для обычного браузера
+                window.open(link, '_blank');
               }
-            } else {
-              // Fallback если Telegram WebApp не доступен
+            } catch (error) {
+              console.error("Ошибка при открытии ссылки:", error);
+              // Fallback при ошибке
+              alert("Не удалось открыть ссылку. Попробуйте вручную: " + link);
               window.open(link, '_blank');
             }
           });
