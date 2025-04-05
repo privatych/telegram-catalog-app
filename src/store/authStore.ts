@@ -6,7 +6,7 @@ import {
   onAuthStateChanged,
   type User
 } from 'firebase/auth';
-import { app } from '../firebase';
+import { auth } from '../firebase/config';
 
 interface AuthState {
   user: User | null;
@@ -18,8 +18,6 @@ interface AuthState {
 }
 
 export const useAuthStore = create<AuthState>((set) => {
-  const auth = getAuth(app);
-
   // Слушаем изменения состояния аутентификации
   onAuthStateChanged(auth, (user) => {
     set({ user, isLoading: false });

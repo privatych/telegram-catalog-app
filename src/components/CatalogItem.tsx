@@ -15,7 +15,7 @@ export const CatalogItem: React.FC<CatalogItemProps> = ({ app }) => {
 
   const handleTelegramClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    window.open(app.link, '_blank');
+    window.open(app.telegramLink, '_blank');
   };
 
   return (

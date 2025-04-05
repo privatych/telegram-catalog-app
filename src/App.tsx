@@ -1,6 +1,8 @@
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import { HashRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import Admin from './pages/Admin';
+import AdminLogin from './pages/AdminLogin';
 import Home from './pages/Home';
+import ProtectedRoute from './components/ProtectedRoute';
 
 const App = () => {
   return (
@@ -16,22 +18,22 @@ const App = () => {
                   </Link>
                 </div>
               </div>
-              <div className="flex items-center">
-                <Link
-                  to="/admin"
-                  className="ml-4 px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700"
-                >
-                  Админ-панель
-                </Link>
-              </div>
             </div>
           </div>
         </nav>
 
-        <main>
+        <main className="max-w-[100vw] overflow-hidden">
           <Routes>
             <Route path="/" element={<Home />} />
-            <Route path="/admin" element={<Admin />} />
+            <Route path="/admin/login" element={<AdminLogin />} />
+            <Route
+              path="/admin"
+              element={
+                <ProtectedRoute>
+                  <Admin />
+                </ProtectedRoute>
+              }
+            />
           </Routes>
         </main>
       </div>

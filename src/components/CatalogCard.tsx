@@ -29,12 +29,13 @@ export const CatalogCard: React.FC<CatalogCardProps> = ({ item }) => {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
       className="bg-white rounded-lg shadow-md overflow-hidden"
+      onClick={handleCardClick}
     >
-      <div className="p-6">
-        <div className="flex items-center justify-between mb-4">
+      <div className="p-4">
+        <div className="flex items-center justify-between mb-3">
           <div className="flex items-center">
-            <span className="text-3xl mr-3">{item.icon}</span>
-            <h2 className="text-xl font-semibold text-gray-900">{item.name}</h2>
+            <img src={item.icon} alt={item.name} className="w-10 h-10 rounded-lg mr-3" />
+            <h2 className="text-lg font-semibold text-gray-900">{item.name}</h2>
           </div>
           <button
             onClick={handleFavoriteClick}
@@ -44,7 +45,7 @@ export const CatalogCard: React.FC<CatalogCardProps> = ({ item }) => {
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6"
+              className="h-5 w-5"
               fill={isFavorite ? 'currentColor' : 'none'}
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -59,33 +60,34 @@ export const CatalogCard: React.FC<CatalogCardProps> = ({ item }) => {
           </button>
         </div>
 
-        <p className="text-gray-600 mb-4">{item.description}</p>
+        <p className="text-sm text-gray-600 mb-3">{item.description}</p>
 
-        <div className="mb-4">
-          <h3 className="text-sm font-medium text-gray-900 mb-2">Функции:</h3>
-          <ul className="list-disc list-inside text-gray-600">
+        <div className="mb-3">
+          <h3 className="text-sm font-medium text-gray-900 mb-1">Особенности:</h3>
+          <ul className="list-disc list-inside text-sm text-gray-600">
             {item.features.map((feature, index) => (
               <li key={index}>{feature}</li>
             ))}
           </ul>
         </div>
 
-        <div className="flex flex-wrap gap-2 mb-4">
-          {item.category.map((cat: string) => (
+        <div className="flex flex-wrap gap-1">
+          {item.tags.map((tag, index) => (
             <span
-              key={cat}
-              className="px-2 py-1 bg-primary/10 text-primary rounded-full text-sm"
+              key={index}
+              className="px-2 py-0.5 bg-gray-100 rounded-full text-xs text-gray-700"
             >
-              {cat}
+              {tag}
             </span>
           ))}
         </div>
 
         <a
-          href={item.link}
+          href={item.telegramLink}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700"
+          className="mt-3 inline-block w-full text-center px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 text-sm"
+          onClick={(e) => e.stopPropagation()}
         >
           Открыть в Telegram
         </a>

@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc } from 'firebase/firestore';
-import { db } from '../firebase';
+import { db } from '../firebase/config';
 
 export interface App {
   id: string;
@@ -9,7 +9,8 @@ export interface App {
   icon: string;
   tags: string[];
   features: string[];
-  link: string;
+  category: 'bots' | 'channels' | 'apps';
+  telegramLink: string;
 }
 
 interface CatalogState {

@@ -1,33 +1,35 @@
-import { CatalogItem } from '../types';
+import { App } from '../types';
 
-export const mockItems: CatalogItem[] = [
+export const mockItems: App[] = [
   {
     id: '1',
-    name: 'ITOQ Space',
-    description: 'Каталог мини-приложений и ботов Telegram. Находите лучшие приложения для ваших задач.',
-    icon: '🚀',
-    tags: ['app', 'catalog'],
+    name: 'ITOQ Space Bot',
+    description: 'Official bot for ITOQ Space community',
+    icon: '🤖',
+    tags: ['bot', 'community', 'support'],
     features: [
-      'Удобный поиск',
-      'Категории приложений',
-      'Подробные описания'
+      'Community management',
+      'User support',
+      'Content moderation'
     ],
-    link: 'https://t.me/itoqspace_bot',
-    category: ['catalog', 'bot']
+    category: 'bots',
+    telegramLink: 'https://t.me/itoqspace_bot',
+    link: 'https://t.me/itoqspace_bot'
   },
   {
     id: '2',
-    name: 'ITOQ Bot',
-    description: 'Многофункциональный бот для управления задачами и проектами в Telegram.',
-    icon: '🤖',
-    tags: ['bot', 'productivity'],
+    name: 'ITOQ Space Channel',
+    description: 'Official channel for ITOQ Space updates',
+    icon: '📢',
+    tags: ['channel', 'updates', 'news'],
     features: [
-      'Управление задачами',
-      'Напоминания',
-      'Интеграция с календарем'
+      'Project updates',
+      'Announcements',
+      'Community news'
     ],
-    link: 'https://t.me/itoq_bot',
-    category: ['bot', 'productivity']
+    category: 'channels',
+    telegramLink: 'https://t.me/itoqspace',
+    link: 'https://t.me/itoqspace'
   },
   {
     id: '3',
@@ -40,8 +42,9 @@ export const mockItems: CatalogItem[] = [
       'Эксклюзивные материалы',
       'Обзоры приложений'
     ],
-    link: 'https://t.me/itoq_news',
-    category: ['channel', 'news']
+    category: 'channels',
+    telegramLink: 'https://t.me/itoq_news',
+    link: 'https://t.me/itoq_news'
   },
   {
     id: '4',
@@ -54,34 +57,53 @@ export const mockItems: CatalogItem[] = [
       'API документация',
       'Примеры кода'
     ],
-    link: 'https://t.me/itoq_dev',
-    category: ['development', 'tools']
+    category: 'apps',
+    telegramLink: 'https://t.me/itoq_dev',
+    link: 'https://t.me/itoq_dev'
   },
   {
     id: '5',
-    type: 'channel',
-    title: 'Crypto Updates',
+    name: 'Crypto Updates',
     description: 'Latest cryptocurrency news and analysis',
     icon: '💎',
-    link: 'tg://resolve?domain=cryptoupdates',
-    category: ['Cryptocurrency', 'Finance'],
+    tags: ['cryptocurrency', 'finance'],
+    features: [
+      'Daily market updates',
+      'Technical analysis',
+      'Trading signals'
+    ],
+    category: 'channels',
+    telegramLink: 'tg://resolve?domain=cryptoupdates',
+    link: 'tg://resolve?domain=cryptoupdates'
   },
   {
     id: '6',
-    type: 'bot',
-    title: 'Translation Bot',
+    name: 'Translation Bot',
     description: 'Translate text between multiple languages',
     icon: '🌐',
-    link: 't.me/translatebot?start=translate',
-    category: ['Language', 'Utility'],
+    tags: ['language', 'utility'],
+    features: [
+      'Multiple language support',
+      'Quick translation',
+      'Language detection'
+    ],
+    category: 'bots',
+    telegramLink: 't.me/translatebot?start=translate',
+    link: 't.me/translatebot?start=translate'
   },
   {
     id: '7',
-    type: 'mini-app',
-    title: 'File Converter',
+    name: 'File Converter',
     description: 'Convert files between different formats',
     icon: '🔄',
-    link: 't.me/fileconverter_bot',
-    category: ['Tools', 'Productivity'],
-  },
+    tags: ['tools', 'productivity'],
+    features: [
+      'Multiple format support',
+      'Batch conversion',
+      'Cloud storage integration'
+    ],
+    category: 'apps',
+    telegramLink: 't.me/fileconverter_bot',
+    link: 't.me/fileconverter_bot'
+  }
 ]; 

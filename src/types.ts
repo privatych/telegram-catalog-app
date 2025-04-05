@@ -3,13 +3,22 @@ export interface App {
   name: string;
   description: string;
   icon: string;
-  tags: string[];
-  features: string[];
+  telegramLink: string;
   link: string;
+  features: string[];
+  tags: string[];
+  category: 'bots' | 'channels' | 'apps';
 }
 
-export interface CatalogItem extends App {
-  category: string[];
+export interface CatalogItem {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+  features: string[];
+  tags: string[];
+  category: 'bots' | 'channels' | 'apps';
+  telegramLink: string;
 }
 
 export interface Category {
@@ -19,11 +28,15 @@ export interface Category {
 }
 
 export interface UserPreferences {
-  darkMode: boolean;
-  favorites: string[];
+  theme: 'light' | 'dark';
+  language: string;
 }
 
-export interface AppState extends UserPreferences {
-  toggleDarkMode: () => void;
+export interface AppState {
+  apps: App[];
+  categories: Category[];
+  selectedCategory: string | null;
+  userPreferences: UserPreferences;
+  favorites: string[];
   toggleFavorite: (id: string) => void;
 } 

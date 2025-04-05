@@ -7,7 +7,8 @@
       "icon": "🤖",
       "tags": ["bot", "automation"],
       "features": ["Command handling", "Inline queries", "Custom keyboards"],
-      "link": "https://t.me/your_bot"
+      "category": "bots",
+      "telegramLink": "https://t.me/your_bot"
     },
     {
       "id": "2",
@@ -16,7 +17,36 @@
       "icon": "📰",
       "tags": ["channel", "news"],
       "features": ["Daily updates", "Breaking news", "Categories"],
-      "link": "https://t.me/your_channel"
+      "category": "channels",
+      "telegramLink": "https://t.me/your_channel"
+    },
+    {
+      "id": "3",
+      "name": "ITOQ Space Bot",
+      "description": "Official bot for ITOQ Space community",
+      "icon": "🤖",
+      "tags": ["bot", "community", "support"],
+      "features": [
+        "Community management",
+        "User support",
+        "Content moderation"
+      ],
+      "category": "bots",
+      "telegramLink": "https://t.me/itoqspace_bot"
+    },
+    {
+      "id": "4",
+      "name": "ITOQ Space Channel",
+      "description": "Official channel for ITOQ Space updates",
+      "icon": "📢",
+      "tags": ["channel", "updates", "news"],
+      "features": [
+        "Project updates",
+        "Announcements",
+        "Community news"
+      ],
+      "category": "channels",
+      "telegramLink": "https://t.me/itoqspace"
     }
   ]
 } 

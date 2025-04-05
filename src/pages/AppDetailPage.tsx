@@ -92,7 +92,7 @@ export const AppDetailPage: React.FC = () => {
 
           <div className="pt-4 border-t border-telegram-light">
             <a
-              href={app.link}
+              href={app.telegramLink}
               target="_blank"
               rel="noopener noreferrer"
               className="w-full inline-block text-center px-4 py-2 bg-telegram-primary text-white rounded-lg

@@ -1,20 +1,40 @@
-export interface CatalogItem {
+export interface App {
   id: string;
-  type: 'channel' | 'bot' | 'mini-app';
-  title: string;
+  name: string;
   description: string;
   icon: string;
-  link: string;
-  category: string[];
+  features: string[];
+  tags: string[];
+  category: 'bots' | 'channels' | 'apps';
+  telegramLink: string;
+}
+
+export interface CatalogItem {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+  features: string[];
+  tags: string[];
+  category: 'bots' | 'channels' | 'apps';
+  telegramLink: string;
 }
 
 export interface Category {
   id: string;
   name: string;
-  icon: string;
 }
 
 export interface UserPreferences {
-  darkMode: boolean;
+  theme: 'light' | 'dark';
+  language: string;
+}
+
+export interface AppState {
+  apps: App[];
+  categories: Category[];
+  selectedCategory: string | null;
+  userPreferences: UserPreferences;
   favorites: string[];
+  toggleFavorite: (id: string) => void;
 } 
