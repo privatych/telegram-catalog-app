@@ -2,21 +2,55 @@
   "apps": [
     {
       "id": "1",
-      "name": "Telegram Bot",
-      "description": "A powerful bot for your Telegram channel",
-      "icon": "🤖",
-      "tags": ["bot", "automation"],
-      "features": ["Command handling", "Inline queries", "Custom keyboards"],
-      "link": "https://t.me/your_bot"
+      "name": "ITOQ Space",
+      "description": "Каталог мини-приложений и ботов Telegram. Находите лучшие приложения для ваших задач.",
+      "icon": "🚀",
+      "tags": ["app", "catalog"],
+      "features": [
+        "Удобный поиск",
+        "Категории приложений",
+        "Подробные описания"
+      ],
+      "link": "https://t.me/itoqspace_bot"
     },
     {
       "id": "2",
-      "name": "News Channel",
-      "description": "Stay updated with the latest news",
+      "name": "ITOQ Bot",
+      "description": "Многофункциональный бот для управления задачами и проектами в Telegram.",
+      "icon": "🤖",
+      "tags": ["bot", "productivity"],
+      "features": [
+        "Управление задачами",
+        "Напоминания",
+        "Интеграция с календарем"
+      ],
+      "link": "https://t.me/itoq_bot"
+    },
+    {
+      "id": "3",
+      "name": "ITOQ News",
+      "description": "Новостной канал о технологиях, разработке и обновлениях Telegram.",
       "icon": "📰",
       "tags": ["channel", "news"],
-      "features": ["Daily updates", "Breaking news", "Categories"],
-      "link": "https://t.me/your_channel"
+      "features": [
+        "Ежедневные обновления",
+        "Эксклюзивные материалы",
+        "Обзоры приложений"
+      ],
+      "link": "https://t.me/itoq_news"
+    },
+    {
+      "id": "4",
+      "name": "ITOQ Dev",
+      "description": "Инструменты и ресурсы для разработчиков Telegram Mini Apps.",
+      "icon": "👨‍💻",
+      "tags": ["app", "development"],
+      "features": [
+        "Шаблоны приложений",
+        "API документация",
+        "Примеры кода"
+      ],
+      "link": "https://t.me/itoq_dev"
     }
   ]
 } 
