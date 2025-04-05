@@ -252,7 +252,7 @@
   <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
 
   <script>
-    // Firebase configuration
+    // Firebase configuration - обновленная конфигурация
     const firebaseConfig = {
       apiKey: "AIzaSyCfaPMrXiWJxn7rOLwEjIlq9FsM7xXxwgU",
       authDomain: "itoq-space.firebaseapp.com",
@@ -263,8 +263,10 @@
       measurementId: "G-6KN9KNQZW2"
     };
 
-    // Initialize Firebase
-    firebase.initializeApp(firebaseConfig);
+    // Initialize Firebase с проверкой существующей инициализации
+    if (!firebase.apps || !firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
     const auth = firebase.auth();
     const db = firebase.firestore();
     

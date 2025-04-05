@@ -214,10 +214,20 @@
     
     <script>
       // Initialize Telegram WebApp
+      let tg;
       if (window.Telegram && window.Telegram.WebApp) {
-        const tg = window.Telegram.WebApp;
+        tg = window.Telegram.WebApp;
+        
+        // Инициализация Telegram WebApp
         tg.ready();
         tg.expand();
+        
+        // Добавление BackButton
+        tg.BackButton.show();
+        tg.BackButton.onClick(() => {
+          // При клике на кнопку "назад" - возвращаемся на предыдущую страницу
+          window.history.back();
+        });
         
         console.log('Telegram WebApp initialized');
         console.log('Platform:', tg.platform);
@@ -236,7 +246,9 @@
       };
 
       // Initialize Firebase
-      firebase.initializeApp(firebaseConfig);
+      if (!firebase.apps || !firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+      }
       const db = firebase.firestore();
       
       // Sample fallback data in case Firebase isn't working
@@ -322,7 +334,22 @@
         document.querySelectorAll('.open-button').forEach(button => {
           button.addEventListener('click', (e) => {
             e.stopPropagation();
-            window.open(button.getAttribute('data-link'), '_blank');
+            const link = button.getAttribute('data-link');
+            
+            // Используем Telegram WebApp API для открытия ссылок, если доступен
+            if (window.Telegram && window.Telegram.WebApp) {
+              // Если ссылка на Telegram ресурс, используем Telegram метод
+              if (link.startsWith('https://t.me/') || link.startsWith('http://t.me/') || link.startsWith('t.me/')) {
+                // Открываем через Telegram
+                window.Telegram.WebApp.openTelegramLink(link);
+              } else {
+                // Обычная ссылка - открываем в браузере
+                window.Telegram.WebApp.openLink(link);
+              }
+            } else {
+              // Fallback если Telegram WebApp не доступен
+              window.open(link, '_blank');
+            }
           });
         });
       }
