@@ -358,14 +358,20 @@
               if (window.Telegram && window.Telegram.WebApp) {
                 // Если это ссылка на Telegram
                 if (link.match(/^(https?:\/\/)?t\.me\//i)) {
-                  console.log("Открываем Telegram ссылку:", link);
+                  // Получаем путь без домена для Telegram
+                  let tgPath = link.replace(/^(https?:\/\/)?t\.me\//i, '');
                   
-                  // Используем прямой метод openLink для Telegram ссылок
-                  window.Telegram.WebApp.openLink(link);
+                  // Удаляем все параметры запроса и хэши, если они есть
+                  tgPath = tgPath.split('?')[0].split('#')[0];
+                  
+                  console.log("Пытаемся открыть Telegram путь:", tgPath);
+                  
+                  // Используем исходный метод из API Telegram
+                  tg.openTelegramLink(tgPath);
                 } else {
                   // Для обычных веб-ссылок используем openLink
                   console.log("Открываем обычную ссылку:", link);
-                  window.Telegram.WebApp.openLink(link);
+                  tg.openLink(link);
                 }
               } else {
                 // Fallback для обычного браузера
