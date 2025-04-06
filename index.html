@@ -358,21 +358,20 @@
               if (window.Telegram && window.Telegram.WebApp) {
                 // Если это ссылка на Telegram
                 if (link.match(/^(https?:\/\/)?t\.me\//i)) {
-                  // Удаляем http/https и t.me/ для корректной работы
-                  const tgPath = link.replace(/^(https?:\/\/)?t\.me\//i, '');
-                  console.log("Открываем Telegram ссылку:", tgPath);
+                  // Получаем путь без домена для Telegram
+                  let tgPath = link.replace(/^(https?:\/\/)?t\.me\//i, '');
                   
-                  if (tg.platform === 'android' || tg.platform === 'ios') {
-                    // Для мобильных платформ используем внутренний API
-                    window.Telegram.WebApp.openTelegramLink('/' + tgPath);
-                  } else {
-                    // Если не мобильная платформа или в случае ошибки, открываем через window.open
-                    window.open('https://t.me/' + tgPath, '_blank');
-                  }
+                  // Удаляем все параметры запроса и хэши, если они есть
+                  tgPath = tgPath.split('?')[0].split('#')[0];
+                  
+                  console.log("Пытаемся открыть Telegram путь:", tgPath);
+                  
+                  // Используем нативный метод Telegram WebApp для открытия внутренних ссылок
+                  tg.openTelegramLink(tgPath);
                 } else {
-                  // Обычная веб-ссылка
+                  // Для обычных веб-ссылок используем openLink
                   console.log("Открываем обычную ссылку:", link);
-                  window.Telegram.WebApp.openLink(link);
+                  tg.openLink(link);
                 }
               } else {
                 // Fallback для обычного браузера
@@ -380,8 +379,32 @@
               }
             } catch (error) {
               console.error("Ошибка при открытии ссылки:", error);
-              // Fallback при ошибке
-              alert("Не удалось открыть ссылку. Попробуйте вручную: " + link);
+              
+              // В случае ошибки показываем сообщение и предлагаем открыть вручную
+              const errorMessage = document.createElement('div');
+              errorMessage.className = 'error-state';
+              errorMessage.style.position = 'fixed';
+              errorMessage.style.top = '50%';
+              errorMessage.style.left = '50%';
+              errorMessage.style.transform = 'translate(-50%, -50%)';
+              errorMessage.style.backgroundColor = 'rgba(0,0,0,0.8)';
+              errorMessage.style.padding = '20px';
+              errorMessage.style.borderRadius = '10px';
+              errorMessage.style.zIndex = '9999';
+              
+              errorMessage.innerHTML = `
+                <p>Не удалось открыть ссылку.</p>
+                <p>Попробуйте вручную: <a href="${link}" target="_blank" style="color: #fff; text-decoration: underline;">${link}</a></p>
+                <button id="closeError" style="padding: 8px 16px; background: #fff; color: #000; border: none; border-radius: 4px; margin-top: 10px;">OK</button>
+              `;
+              
+              document.body.appendChild(errorMessage);
+              
+              document.getElementById('closeError').addEventListener('click', () => {
+                document.body.removeChild(errorMessage);
+              });
+              
+              // Также открываем в новой вкладке, если возможно
               window.open(link, '_blank');
             }
           });
