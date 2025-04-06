@@ -366,8 +366,8 @@
                   
                   console.log("Пытаемся открыть Telegram путь:", tgPath);
                   
-                  // Используем нативный метод Telegram WebApp для открытия внутренних ссылок
-                  tg.openTelegramLink(tgPath);
+                  // Fix: обращаемся к объекту window.Telegram.WebApp напрямую и используем прямой формат ссылки
+                  window.Telegram.WebApp.openTelegramLink("https://t.me/" + tgPath);
                 } else {
                   // Для обычных веб-ссылок используем openLink
                   console.log("Открываем обычную ссылку:", link);
