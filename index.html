@@ -358,16 +358,16 @@
               if (window.Telegram && window.Telegram.WebApp) {
                 // Если это ссылка на Telegram
                 if (link.match(/^(https?:\/\/)?t\.me\//i)) {
-                  // Получаем путь без домена для Telegram
-                  let tgPath = link.replace(/^(https?:\/\/)?t\.me\//i, '');
+                  console.log("Открываем Telegram ссылку:", link);
                   
-                  // Удаляем все параметры запроса и хэши, если они есть
-                  tgPath = tgPath.split('?')[0].split('#')[0];
-                  
-                  console.log("Пытаемся открыть Telegram путь:", tgPath);
-                  
-                  // Используем исходный метод из API Telegram
-                  tg.openTelegramLink(tgPath);
+                  // Проверяем статус WebApp перед открытием
+                  if (tg.isExpanded) {
+                    // Применяем более простой подход, напрямую передаем полную ссылку
+                    window.open(link, '_blank');
+                  } else {
+                    // Если WebApp не в развернутом состоянии, используем стандартный метод
+                    tg.openLink(link);
+                  }
                 } else {
                   // Для обычных веб-ссылок используем openLink
                   console.log("Открываем обычную ссылку:", link);
@@ -379,6 +379,14 @@
               }
             } catch (error) {
               console.error("Ошибка при открытии ссылки:", error);
+              
+              // В случае ошибки, пробуем открыть напрямую
+              try {
+                window.open(link, '_blank');
+                return; // Если успешно открыли, не показываем ошибку
+              } catch (directError) {
+                console.error("Не удалось открыть напрямую:", directError);
+              }
               
               // В случае ошибки показываем сообщение и предлагаем открыть вручную
               const errorMessage = document.createElement('div');
@@ -393,11 +401,12 @@
               errorMessage.style.zIndex = '9999';
               errorMessage.style.color = '#fff';
               errorMessage.style.textAlign = 'center';
+              errorMessage.style.maxWidth = '90%';
               
               errorMessage.innerHTML = `
                 <p>Не удалось открыть ссылку.</p>
-                <p>Попробуйте вручную: <a href="${link}" target="_blank" style="color: #fff; text-decoration: underline;">${link}</a></p>
-                <button id="closeError" style="padding: 8px 16px; background: #fff; color: #000; border: none; border-radius: 4px; margin-top: 10px; width: 100px; cursor: pointer;">OK</button>
+                <p>Попробуйте вручную: <a href="${link}" target="_blank" style="color: #fff; text-decoration: underline; word-break: break-all;">${link}</a></p>
+                <button id="closeError" style="padding: 8px 16px; background: #fff; color: #000; border: none; border-radius: 4px; margin-top: 10px; width: 100px; cursor: pointer; font-weight: bold;">OK</button>
               `;
               
               document.body.appendChild(errorMessage);
@@ -406,28 +415,23 @@
               const closeButton = document.getElementById('closeError');
               
               // Обработчик клика
-              closeButton.onclick = function() {
-                document.body.removeChild(errorMessage);
+              const removeErrorMessage = function() {
+                if (document.body.contains(errorMessage)) {
+                  document.body.removeChild(errorMessage);
+                }
               };
               
-              // Обработчик касания для мобильных устройств
-              closeButton.addEventListener('touchstart', function() {
-                document.body.removeChild(errorMessage);
-              }, {passive: true});
+              // Регистрируем обработчики с четким обозначением действия
+              closeButton.addEventListener('click', removeErrorMessage);
+              closeButton.addEventListener('touchstart', removeErrorMessage, {passive: true});
+              closeButton.addEventListener('touchend', removeErrorMessage, {passive: true});
               
               // Также добавим обработчик для всего модального окна на случай клика вне кнопки
               errorMessage.addEventListener('click', function(e) {
                 if (e.target === errorMessage) {
-                  document.body.removeChild(errorMessage);
+                  removeErrorMessage();
                 }
               });
-              
-              // Также открываем в новой вкладке, если возможно
-              try {
-                window.open(link, '_blank');
-              } catch (e) {
-                console.error("Не удалось открыть ссылку в новой вкладке:", e);
-              }
             }
           });
         });
