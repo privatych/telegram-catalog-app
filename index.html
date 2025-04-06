@@ -239,15 +239,12 @@
         console.log('Theme params:', tg.themeParams);
       }
       
-      // Firebase configuration
+      // Конфигурация Firebase ТОЛЬКО для Firestore, БЕЗ apiKey
       const firebaseConfig = {
-        apiKey: "AIzaSyAo9SiG37s11SV4NMtkgjrD9uJgVMU5TGM",
-        authDomain: "itoqspace.firebaseapp.com",
         projectId: "itoqspace",
         storageBucket: "itoqspace.firebasestorage.app",
         messagingSenderId: "697002222083",
-        appId: "1:697002222083:web:aa613fec438d630d0a2436",
-        measurementId: "G-B72QN28VWV"
+        appId: "1:697002222083:web:aa613fec438d630d0a2436"
       };
 
       // Проверяем, не было ли ранее инициализировано Firebase
