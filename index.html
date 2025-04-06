@@ -358,10 +358,17 @@
               if (window.Telegram && window.Telegram.WebApp) {
                 // Если это ссылка на Telegram
                 if (link.match(/^(https?:\/\/)?t\.me\//i)) {
-                  // Удаляем http/https для корректной работы
+                  // Удаляем http/https и t.me/ для корректной работы
                   const tgPath = link.replace(/^(https?:\/\/)?t\.me\//i, '');
                   console.log("Открываем Telegram ссылку:", tgPath);
-                  window.Telegram.WebApp.openTelegramLink(tgPath);
+                  
+                  if (tg.platform === 'android' || tg.platform === 'ios') {
+                    // Для мобильных платформ используем внутренний API
+                    window.Telegram.WebApp.openTelegramLink('/' + tgPath);
+                  } else {
+                    // Если не мобильная платформа или в случае ошибки, открываем через window.open
+                    window.open('https://t.me/' + tgPath, '_blank');
+                  }
                 } else {
                   // Обычная веб-ссылка
                   console.log("Открываем обычную ссылку:", link);
