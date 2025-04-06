@@ -414,24 +414,49 @@
             console.log('No apps found in Firestore, using fallback data');
             apps = fallbackApps;
           } else {
-            apps = appsSnapshot.docs.map(doc => ({
-              id: doc.id,
-              ...doc.data()
-            }));
+            // Конвертируем документы Firestore в объекты JavaScript
+            apps = [];
+            appsSnapshot.forEach(doc => {
+              const appData = doc.data();
+              // Добавляем id документа в объект приложения
+              apps.push({
+                id: doc.id,
+                ...appData
+              });
+            });
             console.log('Apps loaded from Firestore:', apps.length);
+            
+            // Сохраняем копию в localStorage для работы в офлайн режиме
+            localStorage.setItem('catalog_apps', JSON.stringify(apps));
           }
         } catch (error) {
           console.error('Error fetching apps from Firestore:', error);
-          apps = fallbackApps;
+          
+          // Пробуем загрузить из localStorage
+          const cachedApps = localStorage.getItem('catalog_apps');
+          if (cachedApps) {
+            try {
+              apps = JSON.parse(cachedApps);
+              console.log('Использую кешированные приложения из localStorage:', apps.length);
+            } catch (parseError) {
+              // Если возникла ошибка при парсинге, используем резервные данные
+              apps = fallbackApps;
+              console.error('Ошибка при парсинге кешированных данных:', parseError);
+            }
+          } else {
+            // Если нет данных в localStorage, используем резервные
+            apps = fallbackApps;
+          }
+          
           appList.innerHTML = `
             <div class="error-state">
-              <p>Произошла ошибка при загрузке данных: ${error.message}</p>
-              <p>Используем демо-данные</p>
+              <p>Произошла ошибка при загрузке данных из базы: ${error.message}</p>
+              <p>Используем ${apps === fallbackApps ? 'демо-данные' : 'кешированные данные'}</p>
             </div>
           `;
         }
         
-        // В любом случае рендерим приложения (из Firebase или из fallback)
+        // В любом случае рендерим приложения
         renderApps(selectedCategory);
       }
       
