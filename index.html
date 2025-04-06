@@ -9,33 +9,6 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-    <script type="module">
-      document.addEventListener('DOMContentLoaded', function() {
-        // Проверяем, что мы находимся на админской странице
-        const isAdminPage = window.location.hash.includes('/admin-login') || window.location.hash.includes('/admin');
-        console.log("Текущий путь:", window.location.hash);
-        console.log("Админская страница:", isAdminPage);
-        
-        if (isAdminPage) {
-          // Инициализируем Firebase
-          const firebaseConfig = {
-            apiKey: "3vPjoDvsoNGQ6FXIbHTHBkF5r7JRci23",
-            authDomain: "itoqspace.firebaseapp.com",
-            projectId: "itoqspace",
-            storageBucket: "itoqspace.appspot.com",
-            messagingSenderId: "612345678901",
-            appId: "1:612345678901:web:abc123def456ghi789jkl"
-          };
-
-          // Инициализируем Firebase
-          firebase.initializeApp(firebaseConfig);
-          console.log("Firebase инициализирован на странице администратора");
-        }
-        
-        // Остальной код index.html
-        // ... existing code ...
-      });
-    </script>
     <style>
       * {
         box-sizing: border-box;
@@ -188,19 +161,384 @@
         padding: 30px 20px;
         color: #d73a49;
       }
+
+      /* Скрываем начальный UI на страницах админки */
+      html.admin-page .header,
+      html.admin-page .categories,
+      html.admin-page .app-list {
+        display: none;
+      }
     </style>
   </head>
   <body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    
+    <!-- React App Container -->
     <div id="root"></div>
-    <!--
-      This HTML file is a template.
-      If you open it directly in the browser, you will see an empty page.
+    
+    <!-- Основное приложение, видимо только на главной странице -->
+    <div id="static-app">
+      <header class="header">
+        <h1>ITOQ Space</h1>
+      </header>
+      
+      <div class="categories">
+        <button class="category active" data-id="all">📱 Все</button>
+        <button class="category" data-id="bots">🤖 Боты</button>
+        <button class="category" data-id="channels">📢 Каналы</button>
+        <button class="category" data-id="apps">📲 Приложения</button>
+      </div>
+      
+      <div class="app-list" id="app-list">
+        <div class="spinner"></div>
+      </div>
+    </div>
 
-      You can add webfonts, meta tags, or analytics to this file.
-      The build step will place the bundled scripts into the <body> tag.
+    <!-- Firebase SDK и логика приложения -->
+    <script type="module">
+      document.addEventListener('DOMContentLoaded', function() {
+        // Проверяем, что мы находимся на админской странице
+        const isAdminPage = window.location.hash.includes('/admin-login') || window.location.hash.includes('/admin');
+        console.log("Текущий путь:", window.location.hash);
+        console.log("Админская страница:", isAdminPage);
+        
+        if (isAdminPage) {
+          // Добавляем класс для скрытия статического UI на админ-страницах
+          document.documentElement.classList.add('admin-page');
+          document.getElementById('static-app').style.display = 'none';
+          
+          // Инициализируем Firebase для админки
+          const firebaseConfig = {
+            apiKey: "3vPjoDvsoNGQ6FXIbHTHBkF5r7JRci23",
+            authDomain: "itoqspace.firebaseapp.com",
+            projectId: "itoqspace",
+            storageBucket: "itoqspace.appspot.com",
+            messagingSenderId: "612345678901",
+            appId: "1:612345678901:web:abc123def456ghi789jkl"
+          };
 
-      To begin the development, run `npm start` or `yarn start`.
-      To create a production bundle, use `npm run build` or `yarn build`.
-    -->
+          // Инициализируем Firebase
+          firebase.initializeApp(firebaseConfig);
+          console.log("Firebase инициализирован на странице администратора");
+          
+          // Не выполняем дальнейший код для каталога
+          return;
+        }
+
+        // Initialize Telegram WebApp
+        let tg;
+        if (window.Telegram && window.Telegram.WebApp) {
+          tg = window.Telegram.WebApp;
+          
+          // Инициализация Telegram WebApp
+          tg.ready();
+          tg.expand();
+          
+          // Добавление BackButton - показываем только если история браузера > 1
+          if (window.history.length > 1) {
+            tg.BackButton.show();
+            tg.BackButton.onClick(() => {
+              // При клике на кнопку "назад" - возвращаемся на предыдущую страницу
+              window.history.back();
+            });
+          }
+          
+          console.log('Telegram WebApp initialized');
+          console.log('Platform:', tg.platform);
+          console.log('Theme params:', tg.themeParams);
+        }
+        
+        // Конфигурация Firebase ТОЛЬКО для Firestore, без apiKey
+        const firebaseConfig = {
+          apiKey: "3vPjoDvsoNGQ6FXIbHTHBkF5r7JRci23",
+          authDomain: "itoqspace.firebaseapp.com",
+          projectId: "itoqspace",
+          storageBucket: "itoqspace.appspot.com",
+          messagingSenderId: "612345678901",
+          appId: "1:612345678901:web:abc123def456ghi789jkl"
+        };
+
+        // Проверяем, не было ли ранее инициализировано Firebase
+        let app;
+        try {
+          // Инициализируем Firebase
+          if (typeof firebase !== 'undefined') {
+            app = firebase.initializeApp(firebaseConfig, "catalog-app");
+            console.log("Firebase инициализирован для каталога");
+          } else {
+            console.error("Firebase не определен");
+          }
+        } catch (error) {
+          console.error("Ошибка инициализации Firebase:", error);
+        }
+         
+        // Sample fallback data in case Firebase isn't working
+        const fallbackApps = [
+          {
+            id: "1",
+            name: "TelegramBot Builder",
+            description: "Создавайте ботов без программирования",
+            icon: "🤖",
+            category: "bots",
+            tags: ["Конструктор", "Без кода", "AI"],
+            telegramLink: "https://t.me/BotFather"
+          },
+          {
+            id: "2",
+            name: "InfoChannel",
+            description: "Новости технологий и IT индустрии",
+            icon: "📢",
+            category: "channels",
+            tags: ["Новости", "IT", "Технологии"],
+            telegramLink: "https://t.me/channel"
+          },
+          {
+            id: "3",
+            name: "MiniApp Creator",
+            description: "Создание мини-приложений для Telegram",
+            icon: "📱",
+            category: "apps",
+            tags: ["Разработка", "WebApps", "Telegram"],
+            telegramLink: "https://t.me/miniappcreator"
+          }
+        ];
+         
+        // Apps data
+        let apps = [];
+        let selectedCategory = 'all';
+         
+        // Filter apps by category
+        function filterApps(category) {
+          return category === 'all' 
+            ? apps 
+            : apps.filter(app => app.category === category);
+        }
+         
+        // Render app list
+        function renderApps(category) {
+          const appList = document.getElementById('app-list');
+          const filteredApps = filterApps(category);
+          
+          appList.innerHTML = '';
+          
+          if (filteredApps.length === 0) {
+            appList.innerHTML = `
+              <div class="empty-state">
+                <div class="empty-state-icon">📭</div>
+                <p class="empty-state-text">Нет приложений в выбранной категории</p>
+              </div>
+            `;
+            return;
+          }
+          
+          filteredApps.forEach(app => {
+            const appCard = document.createElement('div');
+            appCard.className = 'app-card';
+            appCard.setAttribute('data-id', app.id);
+            
+            appCard.innerHTML = `
+              <div class="app-icon">${app.icon || '📱'}</div>
+              <div class="app-details">
+                <h3 class="app-name">${app.name || 'Без названия'}</h3>
+                <p class="app-description">${app.description || 'Нет описания'}</p>
+                <div class="tags">
+                  ${(app.tags || []).map(tag => `<span class="tag">${tag}</span>`).join('')}
+                </div>
+                <button class="open-button" data-link="${app.telegramLink}">Открыть</button>
+              </div>
+            `;
+            
+            appList.appendChild(appCard);
+          });
+           
+          // Add event listeners to open buttons
+          document.querySelectorAll('.open-button').forEach(button => {
+            button.addEventListener('click', (e) => {
+              e.stopPropagation();
+              e.preventDefault();
+               
+              const link = button.getAttribute('data-link');
+              console.log("Пытаемся открыть ссылку:", link);
+               
+              try {
+                if (window.Telegram && window.Telegram.WebApp) {
+                  // Если это ссылка на Telegram
+                  if (link.match(/^(https?:\/\/)?t\.me\//i)) {
+                    console.log("Открываем Telegram ссылку:", link);
+                     
+                    // Проверяем статус WebApp перед открытием
+                    if (tg.isExpanded) {
+                      // Применяем более простой подход, напрямую передаем полную ссылку
+                      window.open(link, '_blank');
+                    } else {
+                      // Если WebApp не в развернутом состоянии, используем стандартный метод
+                      tg.openLink(link);
+                    }
+                  } else {
+                    // Для обычных веб-ссылок используем openLink
+                    console.log("Открываем обычную ссылку:", link);
+                    tg.openLink(link);
+                  }
+                } else {
+                  // Fallback для обычного браузера
+                  window.open(link, '_blank');
+                }
+              } catch (error) {
+                console.error("Ошибка при открытии ссылки:", error);
+                 
+                // В случае ошибки, пробуем открыть напрямую
+                try {
+                  window.open(link, '_blank');
+                  return; // Если успешно открыли, не показываем ошибку
+                } catch (directError) {
+                  console.error("Не удалось открыть напрямую:", directError);
+                }
+                 
+                // В случае ошибки показываем сообщение и предлагаем открыть вручную
+                const errorMessage = document.createElement('div');
+                errorMessage.className = 'error-state';
+                errorMessage.style.position = 'fixed';
+                errorMessage.style.top = '50%';
+                errorMessage.style.left = '50%';
+                errorMessage.style.transform = 'translate(-50%, -50%)';
+                errorMessage.style.backgroundColor = 'rgba(0,0,0,0.8)';
+                errorMessage.style.padding = '20px';
+                errorMessage.style.borderRadius = '10px';
+                errorMessage.style.zIndex = '9999';
+                errorMessage.style.color = '#fff';
+                errorMessage.style.textAlign = 'center';
+                errorMessage.style.maxWidth = '90%';
+                
+                errorMessage.innerHTML = `
+                  <p>Не удалось открыть ссылку.</p>
+                  <p>Попробуйте вручную: <a href="${link}" target="_blank" style="color: #fff; text-decoration: underline; word-break: break-all;">${link}</a></p>
+                  <button id="closeError" style="padding: 8px 16px; background: #fff; color: #000; border: none; border-radius: 4px; margin-top: 10px; width: 100px; cursor: pointer; font-weight: bold;">OK</button>
+                `;
+                
+                document.body.appendChild(errorMessage);
+                
+                // Добавляем несколько обработчиков событий, чтобы обеспечить закрытие на мобильных устройствах
+                const closeButton = document.getElementById('closeError');
+                
+                // Обработчик клика
+                const removeErrorMessage = function() {
+                  if (document.body.contains(errorMessage)) {
+                    document.body.removeChild(errorMessage);
+                  }
+                };
+                
+                // Регистрируем обработчики с четким обозначением действия
+                closeButton.addEventListener('click', removeErrorMessage);
+                closeButton.addEventListener('touchstart', removeErrorMessage, {passive: true});
+                closeButton.addEventListener('touchend', removeErrorMessage, {passive: true});
+                
+                // Также добавим обработчик для всего модального окна на случай клика вне кнопки
+                errorMessage.addEventListener('click', function(e) {
+                  if (e.target === errorMessage) {
+                    removeErrorMessage();
+                  }
+                });
+              }
+            });
+          });
+        }
+        
+        // Fetch apps from Firestore
+        async function fetchApps() {
+          const appList = document.getElementById('app-list');
+          appList.innerHTML = '<div class="spinner"></div>';
+          
+          try {
+            // Проверяем наличие интернет-соединения
+            if (!navigator.onLine) {
+              throw new Error("Нет подключения к интернету");
+            }
+            
+            if (!app) {
+              throw new Error("База данных не инициализирована");
+            }
+            
+            // Получаем приложения из Firestore
+            const db = app.firestore();
+            const appsCollection = db.collection('apps');
+            const appsSnapshot = await appsCollection.get();
+            
+            if (appsSnapshot.empty) {
+              console.log('No apps found in Firestore, using fallback data');
+              apps = fallbackApps;
+            } else {
+              // Конвертируем документы Firestore в объекты JavaScript
+              apps = [];
+              appsSnapshot.forEach(doc => {
+                const appData = doc.data();
+                // Добавляем id документа в объект приложения
+                apps.push({
+                  id: doc.id,
+                  ...appData
+                });
+              });
+              console.log('Apps loaded from Firestore:', apps.length);
+              
+              // Сохраняем копию в localStorage для работы в офлайн режиме
+              localStorage.setItem('catalog_apps', JSON.stringify(apps));
+            }
+          } catch (error) {
+            console.error('Error fetching apps from Firestore:', error);
+            
+            // Пробуем загрузить из localStorage
+            const cachedApps = localStorage.getItem('catalog_apps');
+            if (cachedApps) {
+              try {
+                apps = JSON.parse(cachedApps);
+                console.log('Использую кешированные приложения из localStorage:', apps.length);
+              } catch (parseError) {
+                // Если возникла ошибка при парсинге, используем резервные данные
+                apps = fallbackApps;
+                console.error('Ошибка при парсинге кешированных данных:', parseError);
+              }
+            } else {
+              // Если нет данных в localStorage, используем резервные
+              apps = fallbackApps;
+            }
+            
+            appList.innerHTML = `
+              <div class="error-state">
+                <p>Произошла ошибка при загрузке данных из базы: ${error.message}</p>
+                <p>Используем ${apps === fallbackApps ? 'демо-данные' : 'кешированные данные'}</p>
+              </div>
+            `;
+          }
+          
+          // В любом случае рендерим приложения
+          renderApps(selectedCategory);
+        }
+         
+        // Инициализация каталога только если мы не на админ-странице
+        if (!isAdminPage) {
+          // Fetch initial apps
+          fetchApps();
+           
+          // Set up category buttons
+          document.querySelectorAll('.category').forEach(button => {
+            button.addEventListener('click', () => {
+              // Update active button
+              document.querySelector('.category.active').classList.remove('active');
+              button.classList.add('active');
+               
+              // Update selected category and render
+              selectedCategory = button.getAttribute('data-id');
+              renderApps(selectedCategory);
+            });
+          });
+        }
+        
+        // Обработка изменений URL для переключения между режимами (каталог/админка)
+        window.addEventListener('hashchange', function() {
+          const isAdmin = window.location.hash.includes('/admin-login') || window.location.hash.includes('/admin');
+          document.documentElement.classList.toggle('admin-page', isAdmin);
+          document.getElementById('static-app').style.display = isAdmin ? 'none' : 'block';
+        });
+      });
+    </script>
   </body>
 </html>
